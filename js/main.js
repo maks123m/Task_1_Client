@@ -1,5 +1,5 @@
 let product = "Socks";
-Vue.component('product-details',{
+Vue.component('product-details', {
     props: {
         details: {
             type: Array,
@@ -14,6 +14,13 @@ Vue.component('product-details',{
 })
 
 Vue.component('product', {
+    props: {
+        premium: {
+            type: Boolean,
+            required: true
+        }
+    },
+
     template: `
     <div class="product">
         <div class="product-image">
@@ -46,9 +53,6 @@ Vue.component('product', {
             >
             </div>
             
-            <div class="cart">
-                <p>Cart({{ cart }})</p>
-            </div> 
             <button 
             v-on:click="addToCart" 
             :disabled="!inStock"
@@ -61,12 +65,6 @@ Vue.component('product', {
         </div>
     </div>
  `,
-    props: {
-        premium: {
-            type: Boolean,
-            required: true
-        }
-    },
 
     data() {
         return {
@@ -97,20 +95,22 @@ Vue.component('product', {
             ],
 
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
-            cart: 0,
+
         }
     },
     methods: {
         addToCart() {
-            this.cart += 1
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
         },
+
         updateProduct(index) {
             this.selectedVariant = index;
             console.log(index);
         },
         deleteToCart() {
-            this.cart -= 1
+            this.$emit('delete-to-cart', this.variants[this.selectedVariant].variantId);
         },
+
     },
     computed: {
         title() {
@@ -143,6 +143,18 @@ Vue.component('product', {
 let app = new Vue({
     el: '#app',
     data: {
-        premium: true
+        premium: true,
+        cart: [],
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id);
+        },
+        deleteCart(id) {
+            const index = this.cart.lastIndexOf(id);
+            if (index !== -1) {
+                this.cart.splice(index, 1);
+            }
+        }
     }
 })
