@@ -15,7 +15,7 @@ Vue.component('product-tabs', {
         }
     },
 
-    template:`
+    template: `
         <div>   
             <ul>
                 <span class="tab"
@@ -27,8 +27,14 @@ Vue.component('product-tabs', {
 
             <div v-show="selectedTab === 'Reviews'">
                 <p v-if="!reviews.length">There are no reviews yet.</p>
+
+                 <div v-if="reviews.length">
+                    <button @click="sortBy = 'recommend'">Sort by Recommend</button>
+                    <button @click="sortBy = 'rating'">Sort by Rating</button>
+                </div>
+
                 <ul>
-                    <li v-for="review in reviews">
+                    <li v-for="review in displayedReviews">
                         <p>{{ review.name }}</p>
                         <p>Rating: {{ review.rating }}</p>
                         <p>{{ review.review }}</p>
@@ -54,13 +60,34 @@ Vue.component('product-tabs', {
     data() {
         return {
             tabs: ['Reviews', 'Make a Review', 'Details', 'Shipping'],
-            selectedTab: 'Reviews'
+            selectedTab: 'Reviews',
+            sortBy: 'none',
         }
     },
 
     methods: {
         addReview(review) {
             this.$emit('review-submitted', review);
+        }
+    },
+
+    computed: {
+        displayedReviews() {
+
+            if (this.sortBy === 'recommend') {
+                return [...this.reviews].sort((a, b) => {
+                    if (a.survey === 'Yes' && b.survey === 'No') return -1;
+                    if (a.survey === 'No' && b.survey === 'Yes') return 1;
+                    return 0;
+                });
+            }
+
+            if (this.sortBy === 'rating') {
+
+                return [...this.reviews].sort((a, b) => b.rating - a.rating);
+            }
+
+            return this.reviews;
         }
     }
 })
@@ -133,6 +160,7 @@ Vue.component('product-review', {
     },
     methods: {
         onSubmit() {
+            this.errors = [];
             if (this.name && this.review && this.rating && this.survey) {
                 let productReview = {
                     name: this.name,
@@ -188,8 +216,6 @@ Vue.component('product', {
                 <li v-for="size in sizes">{{ size }}</li>
             </ul>
             
-            
-
             <div
                 class="color-box"
                 v-for="(variant, index) in variants"
@@ -276,7 +302,7 @@ Vue.component('product', {
         },
         saleMessage() {
             if (this.onSale) {
-                return this.brand + ' ' + this.product + ' is on sale!';
+                return this.brand + ' ' + this.product + 'is on sale!';
             } else {
                 return this.brand + ' ' + this.product + ' is not on sale';
             }
