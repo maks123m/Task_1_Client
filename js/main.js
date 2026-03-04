@@ -28,7 +28,7 @@ Vue.component('product-tabs', {
             <div v-show="selectedTab === 'Reviews'">
                 <p v-if="!reviews.length">There are no reviews yet.</p>
 
-                 <div v-if="reviews.length">
+                <div v-if="reviews.length">
                     <button @click="sortBy = 'recommend'">Sort by Recommend</button>
                     <button @click="sortBy = 'rating'">Sort by Rating</button>
                 </div>
@@ -61,7 +61,7 @@ Vue.component('product-tabs', {
         return {
             tabs: ['Reviews', 'Make a Review', 'Details', 'Shipping'],
             selectedTab: 'Reviews',
-            sortBy: 'none',
+            sortBy: 'none'
         }
     },
 
@@ -73,7 +73,6 @@ Vue.component('product-tabs', {
 
     computed: {
         displayedReviews() {
-
             if (this.sortBy === 'recommend') {
                 return [...this.reviews].sort((a, b) => {
                     if (a.survey === 'Yes' && b.survey === 'No') return -1;
@@ -83,10 +82,8 @@ Vue.component('product-tabs', {
             }
 
             if (this.sortBy === 'rating') {
-
                 return [...this.reviews].sort((a, b) => b.rating - a.rating);
             }
-
             return this.reviews;
         }
     }
